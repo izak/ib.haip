@@ -24,6 +24,13 @@ To run it (unfortunately it has to run as root):
   sudo bin/haip -vv --wait=2 --route 1/10.0.0.10/10.0.0.1/eth0 \
     --route 2/10.0.0.10/10.0.0.2/ppp0
 
+To simulate a link outage, drop the first fake address to make it unpingable:
+
+  sudo ip addr del 10.0.0.2/32 dev lo
+
+Switchover should occur within a few seconds with this setup. Repeat the first
+command to add it back, and it should switch back again.
+
 The --route options specifies a weight/local_ip/remote_ip/device for each
 route. Lower weights are preferred over higher ones. The remote_ip is pinged,
 using local_ip as source address. If it fails, the lowest non-failed route
