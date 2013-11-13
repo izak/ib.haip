@@ -1,8 +1,19 @@
+import socket
+import fcntl
+import struct
 import logging
 import traceback
 from time import sleep
 from argparse import ArgumentParser
 from ib.haip.ping import ping
+
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
 
 def run():
     parser = ArgumentParser()
@@ -12,7 +23,7 @@ def run():
     parser.add_argument('--verbose', '-v', action='count',
         help="Increase verbosity", default=0)
     parser.add_argument('--route', action='append',
-        help="Route info in format weight/source_ip/destination_ip/gw_ip")
+        help="Route info in format weight/destination_ip/net_device")
     parser.add_argument('--fail', default=3, type=int,
         help="Number of times a ping fails before we switch over")
     parser.add_argument('--wait',
@@ -32,15 +43,16 @@ def run():
     logging.info("Starting haip")
     failcounters = {}
 
-    routes = [x.split('/') for x in options.route]
+    routes = [tuple(x.split('/')) for x in options.route]
     activeroute = None
 
     try:
         while True:
             # Ping the various routes
             for route in routes:
-                route = tuple(route)
-                weight, src, dst, gw = route
+                weight, dst, dev = route
+                src = get_ip_address(dev)
+
                 logging.info("Pinging %s from %s" % (dst, src))
                 try:
                     if ping(dst, src_addr=src):
@@ -66,8 +78,8 @@ def run():
                     activeroute != alternatives[0][0]:
 
                 activeroute = alternatives[0][0]
-                gw = activeroute[3]
-                logging.warn("Switching gateway to %s" % gw)
+                dev = activeroute[2]
+                logging.warn("Switching gateway to %s" % dev)
                 # TODO: Add command here that switches it. Use subprocess
                 # module to call:
                 # ip route replace default dev $gw

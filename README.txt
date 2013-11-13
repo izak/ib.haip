@@ -13,30 +13,29 @@ Create a working directory, you can call it something other than z:
   ../bin/python setup.py develop
   cd ..
 
-Now set up three fake addresses, bind them to a local network interface:
+Now set up two fake addresses, bind them to a local network interface:
 
-  sudo ip addr add 10.0.0.1/32 dev lo
-  sudo ip addr add 10.0.0.2/32 dev lo
-  sudo ip addr add 10.0.0.10/32 dev lo
+  sudo ip addr add 10.0.0.1/32 dev eth0
+  sudo ip addr add 10.0.0.2/32 dev eth0
 
 
 To run it (unfortunately it has to run as root):
-  sudo bin/haip -vv --wait=2 --route 1/10.0.0.10/10.0.0.1/eth0 \
-    --route 2/10.0.0.10/10.0.0.2/ppp0
+  sudo bin/haip -vv --wait=2 --route 1/10.0.0.1/eth0 \
+    --route 2/10.0.0.2/eth0
 
 To simulate a link outage, drop the first fake address to make it unpingable:
 
-  sudo ip addr del 10.0.0.2/32 dev lo
+  sudo ip addr del 10.0.0.2/32 dev eth0
 
 Switchover should occur within a few seconds with this setup. Repeat the first
 command to add it back, and it should switch back again.
 
-The --route options specifies a weight/local_ip/remote_ip/device for each
-route. Lower weights are preferred over higher ones. The remote_ip is pinged,
-using local_ip as source address. If it fails, the lowest non-failed route
-takes it's place. If a lower-weighted route becomes available, that replaces
-the current one again.
+The --route options specifies a weight/remote_ip/device for each route. Lower
+weights are preferred over higher ones. The remote_ip is pinged, using the
+local ip of the device as source address. If it fails, the lowest non-failed
+route takes it's place. If a lower-weighted route becomes available, that
+replaces the current one again.
 
-If you don't want to specify a local_ip, just leave it blank, that is use
---route 1//10.0.0.1/eth0 for example. The local_ip is there to allow you to
-make use of source routing.
+Using the local device ip is done so that source routing should ensure that the
+ping is routed over that interface, so you can test that interface even if the
+default route says otherwise.
