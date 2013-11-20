@@ -3,6 +3,7 @@ import fcntl
 import struct
 import logging
 import traceback
+import subprocess
 from time import sleep
 from argparse import ArgumentParser
 from ib.haip.ping import ping
@@ -14,6 +15,23 @@ def get_ip_address(ifname):
         0x8915,  # SIOCGIFADDR
         struct.pack('256s', ifname[:15])
     )[20:24])
+
+class CommandFailed(Exception):
+    def __init__(self, code):
+        super(CommandFailed, self).__init__(self, code)
+        self.code = code
+
+def sh(command):
+    stdout = open('/dev/null', 'w')
+    stderr = subprocess.STDOUT
+    try:
+        p = subprocess.Popen(command,
+            stdin=subprocess.PIPE, stdout=stdout, stderr=stderr)
+        p.communicate(input=None)
+    finally:
+        stdout.close()
+    if p.returncode != 0:
+        raise CommandFailed(p.returncode)
 
 def run():
     parser = ArgumentParser()
@@ -80,9 +98,10 @@ def run():
                 activeroute = alternatives[0][0]
                 dev = activeroute[2]
                 logging.warn("Switching gateway to %s" % dev)
-                # TODO: Add command here that switches it. Use subprocess
-                # module to call:
-                # ip route replace default dev $gw
+
+                # Call ip route replace default dev $gw
+                sh([options.iptools, 'route', 'replace',
+                    'default', 'dev', dev])
 
             sleep(options.wait)
     except KeyboardInterrupt:

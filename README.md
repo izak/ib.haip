@@ -169,10 +169,5 @@ replace the default route with the next best one.
 TODO
 ====
 
-1. The actual command that replaces the route isn't in place yet. It's a simple
-matter of importing the python subprocess module and doing it, I just need
-to hack around to it. I kinda left out the most important bit of the whole
-project, so this is more of a proof of concept right now.
-
-2. It needs a good startup script, logging, and all those things. And it needs
+1. It needs a good startup script, logging, and all those things. And it needs
 to be turned into a debian package.
