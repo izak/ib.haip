@@ -169,9 +169,9 @@ replace the default route with the next best one.
 You can fake unreachability by adding an unreachable route and removing it
 again later.
 
-    sudo ip route add unreachable 8.8.8.8 && \
+    sudo ip route add unreachable 8.8.8.8 table T1 && \
     sleep 20 && \
-    sudo ip route del unreachable 8.8.8.8
+    sudo ip route del unreachable 8.8.8.8 table T1
 
 TODO
 ====
