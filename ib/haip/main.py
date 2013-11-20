@@ -22,6 +22,7 @@ class CommandFailed(Exception):
         self.code = code
 
 def sh(command):
+    logging.info('Executing command %s', ' '.join(command))
     stdout = open('/dev/null', 'w')
     stderr = subprocess.STDOUT
     try:
@@ -41,7 +42,7 @@ def run():
     parser.add_argument('--verbose', '-v', action='count',
         help="Increase verbosity", default=0)
     parser.add_argument('--route', action='append',
-        help="Route info in format weight/destination_ip/net_device")
+        help="Route info in format weight/destination_ip/net_device:[gw-ip]")
     parser.add_argument('--fail', default=3, type=int,
         help="Number of times a ping fails before we switch over")
     parser.add_argument('--wait',
@@ -69,6 +70,7 @@ def run():
             # Ping the various routes
             for route in routes:
                 weight, dst, dev = route
+                dev = dev.split(':')[0]
                 src = get_ip_address(dev)
 
                 logging.info("Pinging %s from %s" % (dst, src))
@@ -100,8 +102,12 @@ def run():
                 logging.warn("Switching gateway to %s" % dev)
 
                 # Call ip route replace default dev $gw
-                sh([options.iptools, 'route', 'replace',
-                    'default', 'dev', dev])
+                dev = dev.split(':')
+                cmd = [options.iptools, 'route', 'replace', 'default']
+                if len(dev) > 1:
+                    cmd.extend(['via', dev[1]])
+                cmd.extend(['dev', dev[0]])
+                sh(cmd)
 
             sleep(options.wait)
     except KeyboardInterrupt:
