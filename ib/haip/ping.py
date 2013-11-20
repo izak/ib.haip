@@ -211,7 +211,7 @@ def ping(dest_addr, src_addr=None, timeout = 2):
     """ Ping method that simply returns true if it works out. """
     try:
         delay = do_one(src_addr, dest_addr, timeout)
-    except socket.gaierror, e:
+    except socket.error, e:
         return False
     return delay is not None
 
