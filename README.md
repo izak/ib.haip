@@ -166,6 +166,13 @@ This should ping the same ip (8.8.8.8, a google dns server, but replace with
 whatever you want) over both interfaces, and if any link goes down it will
 replace the default route with the next best one.
 
+You can fake unreachability by adding an unreachable route and removing it
+again later.
+
+    sudo ip route add unreachable 8.8.8.8 && \
+    sleep 20 && \
+    sudo ip route del unreachable 8.8.8.8
+
 TODO
 ====
 
