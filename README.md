@@ -32,7 +32,7 @@ To develop
 
 * To simulate a link outage, drop the first fake address to make it unpingable:
 
-        sudo ip addr del 10.0.0.2/32 dev eth0
+        sudo ip addr del 10.0.0.1/32 dev eth0
 
 * Switchover should occur within a few seconds with this setup. Repeat the first
   command to add it back, and it should switch back again.
@@ -43,9 +43,7 @@ local ip of the device as source address. If it fails, the lowest non-failed
 route takes it's place. If a lower-weighted route becomes available, that
 replaces the current one again.
 
-Using the local device ip is done so that source routing should ensure that the
-ping is routed over that interface, so you can test that interface even if the
-default route says otherwise.
+When you are done, use the del command above to remove both ip addresses again.
 
 Simple example
 -------------
