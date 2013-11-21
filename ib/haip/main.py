@@ -3,10 +3,10 @@ import fcntl
 import struct
 import logging
 import traceback
-import subprocess
 from time import sleep
 from argparse import ArgumentParser
-from ib.haip.ping import ping
+from ib.haip import ping as pingmodule
+from ib.haip.util import sh
 
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -16,29 +16,13 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 
-class CommandFailed(Exception):
-    def __init__(self, code):
-        super(CommandFailed, self).__init__(self, code)
-        self.code = code
-
-def sh(command):
-    logging.info('Executing command %s', ' '.join(command))
-    stdout = open('/dev/null', 'w')
-    stderr = subprocess.STDOUT
-    try:
-        p = subprocess.Popen(command,
-            stdin=subprocess.PIPE, stdout=stdout, stderr=stderr)
-        p.communicate(input=None)
-    finally:
-        stdout.close()
-    if p.returncode != 0:
-        raise CommandFailed(p.returncode)
-
 def run():
     parser = ArgumentParser()
     parser.add_argument('--logfile', help="The filename to log to")
     parser.add_argument('--iptools', default='/sbin/ip',
         help="Location of iptools binary")
+    parser.add_argument('--ping', default='/bin/ping',
+        help="Location of ping binary")
     parser.add_argument('--verbose', '-v', action='count',
         help="Increase verbosity", default=0)
     parser.add_argument('--route', action='append',
@@ -59,6 +43,9 @@ def run():
         logging.basicConfig(level=max(4-options.verbose,1)*10,
             format='%(asctime)s %(levelname)s %(message)s')
 
+    # Configure ping module
+    pingmodule.PING = options.ping
+
     logging.info("Starting haip")
     failcounters = {}
 
@@ -75,7 +62,7 @@ def run():
 
                 logging.info("Pinging %s from %s" % (dst, src))
                 try:
-                    if ping(dst, src_addr=src):
+                    if pingmodule.ping(dst, src_addr=src):
                         failcounters[route] = 0
                         logging.info("success, resetting failcount")
                     else:
