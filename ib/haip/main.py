@@ -1,9 +1,11 @@
+import os
 import socket
 import fcntl
 import struct
 import logging
 import traceback
 from time import sleep
+import shlex
 from argparse import ArgumentParser
 from ib.haip import ping as pingmodule
 from ib.haip.util import sh
@@ -31,6 +33,8 @@ def run():
         help="Number of times a ping fails before we switch over")
     parser.add_argument('--wait',
         default=10, type=int, help="Seconds to wait between pings")
+    parser.add_argument('--toggle',
+        help="Executable to call each time after the gateway was toggled")
 
     options = parser.parse_args()
 
@@ -100,6 +104,16 @@ def run():
                     cmd.extend(['via', dev[1]])
                 cmd.extend(['dev', dev[0]])
                 sh(cmd)
+
+                # Call the toggle command
+                if options.toggle is not None:
+                    env = {
+                        'IPTOOLS': options.iptools,
+                        'IFNAME': dev[0],
+                        'GATEWAY': len(dev) > 1 and dev[1] or '',
+                    }
+                    env.update(os.environ)
+                    sh(shlex.split(options.toggle), env=env)
 
             sleep(options.wait)
     except KeyboardInterrupt:
