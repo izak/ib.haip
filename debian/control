@@ -1,0 +1,14 @@
+Source: haip
+Section: utils
+Priority: optional
+Maintainer: Izak Burger <izak@upfrontsystems.co.za>
+Build-Depends: debhelper (>= 9.0.0), python
+Standards-Version: 3.9.4
+
+Package: haip
+Architecture: all
+Depends: ${misc:Depends}, python
+Description: A tool for high availability IP connectivity
+ ib.haip is a python daemon that monitors a number of connections using
+ ping, and selects the best one depending on availability. It uses iproute2
+ to do source based routing, and manages the default route.
