@@ -1,0 +1,26 @@
+# Defaults for HAIP init script
+# Sourced from /etc/init.d/haip
+# installed at /etc/default/haip by the maintainer scripts
+
+#
+# This is a POSIX shell fragment
+#
+
+# How long to pause between pings
+WAIT=30
+
+# The master route
+ROUTES="--route 1/8.8.8.8/wlan0:192.168.8.1"
+
+# Additional routes
+ROUTES="$ROUTES --route 2/8.8.8.8/ppp0"
+
+# A script or executable to call whenever we change routes. The enviroment of
+# this script will contain:
+# IPTOOLS: path to the iptools2 binary
+# IFNAME: Name of the chosen interface via which the new default route goes.
+# GATEWAY: IP address of the new gateway or blank if route is Point to Point.
+#TOGGLE="/usr/local/sbin/newgateway.sh"
+
+# Additional options.
+OPTS="-vv"

@@ -1,0 +1,45 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          haip
+# Required-Start:    $local_fs $network $syslog
+# Required-Stop:     $local_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop High Availability IP service
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/haip
+NAME="haip"
+DESC="High Availability IP service"
+
+test -x $DAEMON || exit 0
+
+test -f /etc/default/$NAME || exit 1
+
+. /etc/default/$NAME
+
+set -e
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid --make-pidfile --background \
+		--exec $DAEMON -- ${OPTS} ${WAIT:+--wait=$WAIT} ${ROUTES} \
+        --logfile=${LOGFILE:-/var/log/haip.log} ${TOGGLE:+--toggle=$TOGGLE}
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/$NAME.pid \
+		&& rm -f /var/run/$NAME.pid
+	echo "$NAME."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
