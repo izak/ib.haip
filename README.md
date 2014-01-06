@@ -86,6 +86,10 @@ Configure `/etc/ppp/peers/provider`
 
     hide-password
     noauth
+    persist
+    lcp-echo-interval 30
+    lcp-echo-failure 4
+    maxfail 0
     connect "/usr/sbin/chat -v -f /etc/chatscripts/provider"
     debug
     /dev/ttyACM1
@@ -172,9 +176,3 @@ again later.
     sudo ip route add unreachable 8.8.8.8 table T1 && \
     sleep 20 && \
     sudo ip route del unreachable 8.8.8.8 table T1
-
-TODO
-====
-
-1. It needs a good startup script, logging, and all those things. And it needs
-to be turned into a debian package.
