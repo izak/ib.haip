@@ -139,6 +139,12 @@ this command:
 
     ifup ppp0
 
+There appears to be a bug on some versions of ubuntu where auto-starting fails
+from `/etc/network/interfaces` fails. In that case, edit `/etc/rc.local` and
+add a line to start pppd:
+
+    /usr/bin/pon provider
+
 So what's with all the routing?
 -------------------------------
 
