@@ -98,6 +98,7 @@ Configure `/etc/ppp/peers/provider`
     user "internet"
     remotename provider
     ipparam provider
+    unit 0
 
 Notice that `defaultroute` and `userpeerdns` is explicitly disabled here. You
 should configure a DNS solution, the easiest of which is to use an open dns
