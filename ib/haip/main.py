@@ -60,14 +60,20 @@ def run():
         while True:
             # Ping the various routes
             for route in routes:
-                weight, dst, dev = route
-                dev = dev.split(':')[0]
-                try:
-                    src = get_ip_address(dev)
-                except IOError:
-                    failcounters[route] = min(failcounters.get(route, 0), options.fail) + 1
-                    logging.error('Cannot find ip for device %s', dev)
-                    continue
+                if len(route) > 3:
+                    weight, dst, dev, src = route
+                    dev = dev.split(':')[0]
+                else:
+                    weight, dst, dev = route
+                    dev = dev.split(':')[0]
+
+                    # Determine src ip
+                    try:
+                        src = get_ip_address(dev)
+                    except IOError:
+                        failcounters[route] = min(failcounters.get(route, 0), options.fail) + 1
+                        logging.error('Cannot find ip for device %s', dev)
+                        continue
 
                 logging.info("Pinging %s from %s" % (dst, src))
                 try:
