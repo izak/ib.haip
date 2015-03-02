@@ -1,3 +1,11 @@
+haip (2) unstable; urgency=low
+
+  * Ping foxed.
+  * Allow specifying source address on route config.
+  * Leave flag files in status directory for monitoring.
+
+ -- Izak Burger <isburger@gmail.com>  Mon, 02 Mar 2015 14:33:00 +0200
+
 haip (1) unstable; urgency=low
 
   * Initial release
