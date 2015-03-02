@@ -22,5 +22,8 @@ ROUTES="$ROUTES --route 2/8.8.8.8/ppp0"
 # GATEWAY: IP address of the new gateway or blank if route is Point to Point.
 #TOGGLE="/usr/local/sbin/newgateway.sh"
 
+# A directory to place status files
+STATUS=/var/run/haip
+
 # Additional options.
 OPTS="-vv"

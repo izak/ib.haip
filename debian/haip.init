@@ -24,9 +24,15 @@ set -e
 case "$1" in
   start)
 	echo -n "Starting $DESC: "
+    # Create the run directory if it doesn't exist. Necessary because /var/run
+    # is wiped on reboot.
+    if test -n "$STATUS"; then
+        mkdir -p $STATUS
+    fi
 	start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid --make-pidfile --background \
 		--exec $DAEMON -- ${OPTS} ${WAIT:+--wait=$WAIT} ${ROUTES} \
-        --logfile=${LOGFILE:-/var/log/haip.log} ${TOGGLE:+--toggle=$TOGGLE}
+        --logfile=${LOGFILE:-/var/log/haip.log} ${TOGGLE:+--toggle=$TOGGLE} \
+        ${STATUS:+--status=$STATUS}
 	echo "$NAME."
 	;;
   stop)
