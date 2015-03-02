@@ -35,6 +35,8 @@ def run():
         default=10, type=int, help="Seconds to wait between pings")
     parser.add_argument('--toggle',
         help="Executable to call each time after the gateway was toggled")
+    parser.add_argument('--status',
+        help="Directory where status files are placed. Can be used for monitoring.")
 
     options = parser.parse_args()
 
@@ -80,6 +82,12 @@ def run():
                     if pingmodule.ping(dst, src_addr=src):
                         failcounters[route] = 0
                         logging.info("success, resetting failcount")
+                        if options.status:
+                            try:
+                                # Just touch the file
+                                open(os.path.join(options.status, dev), 'w').close()
+                            except IOError, e:
+                                logging.error(e)
                     else:
                         failcounters[route] = min(failcounters.get(route, 0), options.fail) + 1
                         logging.info("fail, incrementing failcount to %d",
