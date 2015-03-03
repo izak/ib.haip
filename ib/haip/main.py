@@ -63,11 +63,11 @@ def run():
             # Ping the various routes
             for route in routes:
                 if len(route) > 3:
-                    weight, dst, dev, src = route
-                    dev = dev.split(':')[0]
+                    weight, dst, _dev, src = route
+                    dev = _dev.split(':')[0]
                 else:
-                    weight, dst, dev = route
-                    dev = dev.split(':')[0]
+                    weight, dst, _dev = route
+                    dev = _dev.split(':')[0]
 
                     # Determine src ip
                     try:
@@ -85,7 +85,7 @@ def run():
                         if options.status:
                             try:
                                 # Just touch the file
-                                open(os.path.join(options.status, dev), 'w').close()
+                                open(os.path.join(options.status, _dev), 'w').close()
                             except IOError, e:
                                 logging.error(e)
                     else:

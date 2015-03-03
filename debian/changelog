@@ -1,6 +1,13 @@
+haip (3) unstable; urgency=low
+
+  * Include gw ip address in touched file, for cases where both routes go via
+    the same interface.
+
+ -- Izak Burger <isburger@gmail.com>  Mon, 03 Mar 2015 09:50:00 +0200
+
 haip (2) unstable; urgency=low
 
-  * Ping foxed.
+  * Ping fixed.
   * Allow specifying source address on route config.
   * Leave flag files in status directory for monitoring.
 
